@@ -1,0 +1,43 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "build",
+                "buildCommand": "CI=false npm run build",
+                "installCommand": "npm install"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/icon.png",
+            "dest": "/icon.png"
+        },
+        {
+            "src": "/icon.svg",
+            "dest": "/icon.svg"
+        },
+        {
+            "src": "/favicon.ico",
+            "dest": "/favicon.ico"
+        },
+        {
+            "src": "/static/(.*)",
+            "dest": "/static/$1"
+        },
+        {
+            "src": "/manifest.json",
+            "dest": "/manifest.json"
+        },
+        {
+            "src": "/.*",
+            "dest": "/index.html"
+        }
+    ],
+    "env": {
+        "CI": "false"
+    }
+}
