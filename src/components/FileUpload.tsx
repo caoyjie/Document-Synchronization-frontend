@@ -42,8 +42,10 @@ const FileUpload: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null);
   const [lastResponse, setLastResponse] = useState<ApiResponse | null>(null);
+  // Comment out URL input type - URL upload is not fully implemented yet
   const [inputType, setInputType] = useState<'files' | 'url'>('files');
-  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number }>({ current: 0, total: 0 });
+  // const [inputType, setInputType] = useState<'files' | 'url'>('files');
+  const [uploadProgress, setUploadProgress] = useState<{ current: number, total: number }>({ current: 0, total: 0 });
   // Add state for tracking individual file upload results
   const [uploadResults, setUploadResults] = useState<FileUploadResult[]>([]);
 
@@ -108,7 +110,8 @@ const FileUpload: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!formData.file && !formData.url && formData.files.length === 0) || !formData.token || !formData.dbId) {
+    // Modified validation to only check for files, not URL
+    if ((!formData.file && formData.files.length === 0) || !formData.token || !formData.dbId) {
       setMessage({ type: 'error', text: 'Please fill in all required fields' });
       return;
     }
@@ -267,14 +270,18 @@ const FileUpload: React.FC = () => {
             text: `Uploaded ${successCount} of ${totalFiles} files successfully. ${failureCount} files failed.` 
           });
         }
-      } else if (formData.file || formData.url) {
-        // Handle single file or URL
+      } else if (formData.file) {
+        // Handle single file only - URL upload is commented out
         const formDataToSend = new FormData();
         if (formData.file) {
           formDataToSend.append('file', formData.file);
-        } else if (formData.url) {
+        }
+        // URL upload is commented out
+        /*
+        else if (formData.url) {
           formDataToSend.append('file', formData.url);
         }
+        */
         formDataToSend.append('token', formData.token);
         formDataToSend.append('db_id', formData.dbId);
         if (formData.tags) {
@@ -291,7 +298,7 @@ const FileUpload: React.FC = () => {
           
           // Add result to uploadResults
           setUploadResults(prev => [...prev, {
-            fileName: formData.file ? formData.file.name : formData.url,
+            fileName: formData.file ? formData.file.name : '',
             success: response.data.success,
             message: response.data.success ? 'File uploaded successfully' : response.data.message,
             pageId: response.data.page_id,
@@ -328,7 +335,7 @@ const FileUpload: React.FC = () => {
           
           // Add error result to uploadResults
           setUploadResults(prev => [...prev, {
-            fileName: formData.file ? formData.file.name : formData.url,
+            fileName: formData.file ? formData.file.name : '',
             success: false,
             message: errorMessage
           }]);
@@ -365,12 +372,15 @@ const FileUpload: React.FC = () => {
           >
             Upload File/Files
           </button>
+          {/* URL upload button is commented out - not fully implemented yet */}
+          {/* 
           <button
             className={`input-type-button ${inputType === 'url' ? 'active' : ''}`}
             onClick={() => setInputType('url')}
           >
             URL
           </button>
+          */}
         </div>
 
         {inputType === 'files' && (
@@ -396,6 +406,8 @@ const FileUpload: React.FC = () => {
           </div>
         )}
 
+        {/* URL input container is commented out - not fully implemented yet */}
+        {/* 
         {inputType === 'url' && (
           <div className="url-input-container">
             <div className="form-group">
@@ -412,6 +424,7 @@ const FileUpload: React.FC = () => {
             </div>
           </div>
         )}
+        */}
 
         {formData.files.length > 0 && inputType === 'files' && (
           <div className="selected-files">
