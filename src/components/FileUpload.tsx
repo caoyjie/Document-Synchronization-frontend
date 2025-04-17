@@ -161,9 +161,7 @@ const FileUpload: React.FC = () => {
             try {
               const response = await axios.post<ApiResponse>(`${API_BASE_URL}/api/upload`, formDataToSend, {
                 headers: {
-                  'Content-Type': 'multipart/form-data',
-                  'Accept': 'application/json',
-                  'Origin': window.location.origin
+                  'Content-Type': 'multipart/form-data'
                 },
                 withCredentials: true
               });
@@ -287,8 +285,6 @@ const FileUpload: React.FC = () => {
           const response = await axios.post<ApiResponse>(`${API_BASE_URL}/api/upload`, formDataToSend, {
             headers: {
               'Content-Type': 'multipart/form-data',
-              'Accept': 'application/json',
-              'Origin': window.location.origin
             },
             withCredentials: true
           });
@@ -450,7 +446,7 @@ const FileUpload: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label>Tags (comma-separated)</label>
+            <label>Tags (optional, comma-separated)</label>
             <input
               type="text"
               placeholder="Enter tags separated by commas (e.g., tag1, tag2, tag3)"

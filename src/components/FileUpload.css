@@ -277,11 +277,15 @@
   background: rgba(99, 102, 241, 0.1);
   border-radius: 0.5rem;
   transition: all 0.2s ease;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .notion-link:hover {
   background: rgba(99, 102, 241, 0.2);
   transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .loading-spinner {
@@ -501,4 +505,38 @@
   color: var(--text-color);
   opacity: 0.7;
   margin-top: 0.25rem;
+}
+
+.manual-url-container {
+  margin-top: 0.5rem;
+}
+
+.manual-url-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.manual-url-input input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.submit-url-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-url-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
 } 

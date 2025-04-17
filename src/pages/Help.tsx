@@ -16,7 +16,7 @@ const Help: React.FC = () => {
           <li>Go to <a href="https://www.notion.so/my-integrations" target="_blank" rel="noopener noreferrer">Notion Integrations</a> and create a new integration</li>
           <li>Copy your integration token - you'll need this for authentication</li>
           <li>In your Notion workspace, open the database where you want to sync files</li>
-          <li>Click the "..." menu in the top right of your database</li>
+          <li>Click the "..." menu in the top right of your database, <span className="highlight">your database must inclue two columns: "Title" and "tags" (case-sensitive)</span></li>
           <li>Select "Add connections" and choose your integration</li>
           <li>Copy your database ID from the URL (it's the part after the workspace name and before the question mark)</li>
         </ol>
@@ -24,13 +24,11 @@ const Help: React.FC = () => {
 
       <div className="help-section">
         <h2>How to Use</h2>
-        <p>Once you've completed the setup, you can upload files in three ways:</p>
+        <p>Once you've completed the setup, you can upload file/files:</p>
         <ul>
-          <li><strong>Single File:</strong> Drag and drop a markdown file or click to select one</li>
-          <li><strong>Folder Upload:</strong> Select an entire folder of markdown files</li>
-          <li><strong>URL:</strong> Enter a URL to a markdown file hosted online</li>
+          <li><strong>Select some Files:</strong> Drag and drop or click to select some files</li>
+          <li><strong>Upload:</strong> Click the upload button</li>
         </ul>
-        <p>Supported file types: .md, .markdown</p>
       </div>
 
       <div className="help-section">
@@ -47,7 +45,7 @@ const Help: React.FC = () => {
         <h2>Troubleshooting</h2>
         <h3>Common Issues</h3>
         <ul>
-          <li><strong>Upload Failed:</strong> Double-check your token and database ID</li>
+          <li><strong>Upload Failed:</strong> Double-check your token, database ID and set the correct columns name in your database</li>
           <li><strong>Character Limit Errors:</strong> Notion has a 100-character limit for paragraphs, code blocks, and table cells. Content exceeding this limit will be truncated.</li>
           <li><strong>API Errors:</strong> If you see errors about specific blocks, the application will automatically remove problematic blocks and retry the upload.</li>
         </ul>
@@ -100,43 +98,15 @@ const Help: React.FC = () => {
       </div>
 
       <div className="help-section">
-        <h2>Checking Logs for Errors</h2>
-        <p>For detailed information about errors, check the application logs:</p>
-        <ul>
-          <li><strong>Docker Deployment:</strong> Run <code>docker logs sync2notion-container</code></li>
-          <li><strong>Local Development:</strong> Check the terminal where the server is running</li>
-        </ul>
-        <p>The logs will show:</p>
-        <ul>
-          <li>Which blocks were removed due to API errors</li>
-          <li>Which content was truncated due to character limits</li>
-          <li>Authentication and database access issues</li>
-          <li>Other technical details that can help with troubleshooting</li>
-        </ul>
-      </div>
-
-      <div className="help-section">
-        <h2>Need More Help?</h2>
-        <p>
-          If you're still having issues, please contact us at{' '}
-          <a href="mailto:support@sync2notion.com">support@sync2notion.com</a>
-        </p>
-      </div>
-
-      <div className="help-section">
         <h2>Future Enhancements</h2>
         <p>
-          We're constantly working to improve Sync2Notion. Here are some planned enhancements:
+          We're constantly working to improve Sync to Notion. Here are some planned enhancements:
         </p>
         <ul>
           <li><strong>Math/LaTeX Support:</strong> Add support for rendering mathematical equations and LaTeX formulas in Notion pages</li>
-          <li><strong>AI-Assisted Markdown:</strong> Integrate AI capabilities with MarkItDown to improve content conversion</li>
           <li><strong>User Authentication:</strong> Implement user login and account management</li>
           <li><strong>Database Integration:</strong> Use PostgreSQL to store user information and other application data</li>
           <li><strong>S3 Backup:</strong> Automatically backup temporary files to S3 for improved reliability</li>
-          <li><strong>Additional Format Support:</strong> Expand support for more file formats and content types</li>
-          <li><strong>Performance Improvements:</strong> Optimize processing for large documents and batch uploads</li>
-          <li><strong>Nested List Support:</strong> Improve handling of nested structures in unordered (ul) and ordered (ol) lists</li>
           <li><strong>Multi-Platform Support:</strong> Extend functionality to other platforms beyond Notion, such as:
             <ul>
               <li>Obsidian</li>
@@ -149,6 +119,15 @@ const Help: React.FC = () => {
           <li><strong>Text Formatting Support:</strong> Add support for analyzing and preserving italic, underline, and strikethrough text formatting</li>
         </ul>
         <p>Stay tuned for updates as we continue to enhance Sync2Notion!</p>
+      </div>
+
+
+      <div className="help-section">
+        <h2>Need More Help?</h2>
+        <p>
+          If you're still having issues, please contact us at{' '}
+          <a href="mailto:support@sync2notion.com">support@sync2notion.com</a>
+        </p>
       </div>
 
       <div className="help-actions">
