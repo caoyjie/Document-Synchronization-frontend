@@ -99,7 +99,7 @@ const FileUpload: React.FC = () => {
     tags: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string | React.ReactNode } | null>(null);
   const [lastResponse, setLastResponse] = useState<ApiResponse | null>(null);
   // Comment out URL input type - URL upload is not fully implemented yet
   const [inputType, setInputType] = useState<'files' | 'url'>('files');
@@ -289,7 +289,19 @@ const FileUpload: React.FC = () => {
                     errorMsg += `${axiosError.response.data.error.message}`;
                     // if axiosError.response.data.error.message = "API token is invalid" or "Database ID should be a valid uuid" or "<xxx> not exist in your database" end the rest tasks, show the error message      
                     if (axiosError.response.data.error.message === "API token is invalid" || axiosError.response.data.error.message === "Database ID should be a valid uuid" || axiosError.response.data.error.message.includes("not exist in your database")) {
-                      setMessage({ type: 'error', text: axiosError.response.data.error.message });
+                      
+                      setMessage({ 
+                        type: 'error', 
+                        text: (
+                          <>
+                            {axiosError.response.data.error.message}{' '}
+                            <Link to="/help" className="help-link">
+                              Need help?
+                            </Link>
+                          </>
+                        )
+                      });
+                      // the message should add: a link of help page(src/pages/Help.tsx) behind the axiosError.response.data.error.message
                       setIsLoading(false);
                       return;
                     }

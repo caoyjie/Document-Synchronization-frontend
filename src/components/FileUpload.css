@@ -572,4 +572,15 @@
   background: rgba(99, 102, 241, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.help-link {
+  color: #cb1a67;
+  text-decoration: underline;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.help-link:hover {
+  color: #004999;
 } 
