@@ -2,7 +2,31 @@ import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import './FileUpload.css';
+/* backend api response format
+def make_error_response(code: int, message: str, details=None):
+    return jsonify({
+        "success": False,
+        "error": {
+            "code": code,
+            "message": message,
+            "details": details if details else {}
+        },
+        "request_id": getattr(g, 'request_id', None),
+        "timestamp": getattr(g, 'timestamp', datetime.now().isoformat())
+    }), code
 
+def make_success_response(data=None, message="Success"):
+    return jsonify({
+        "success": True,
+        "message": message,
+        "data": data,
+        "request_id": getattr(g, 'request_id', None),
+        "timestamp": getattr(g, 'timestamp', datetime.now().isoformat())
+    })
+
+    error block response format
+    {'page_url': 'https://www.notion.so/large_text-1d918d3ed10a811e8345da34d67928ee', 'stats': {'total_blocks': 3, 'successful_blocks': 2, 'failed_blocks': 1, 'problem_blocks_count': 1}, 'problem_blocks': '{\n
+*/
 interface FormData {
   file: File | null;
   files: File[];
@@ -12,12 +36,31 @@ interface FormData {
   tags: string;
 }
 
-interface ApiResponse {
+interface ApiSuccessResponse {
   success: boolean;
   message: string;
+  data?: Record<string, unknown>;
+  request_id?: string;
+  timestamp?: string;
   page_id?: string;
   page_url?: string;
 }
+
+interface ApiErrorResponse {
+  success: boolean;
+  message: string;
+  error: {
+    code: number;
+    message: string;
+    details?: Record<string, unknown>;
+  };
+  request_id?: string;
+  timestamp?: string;
+  page_id?: string;
+  page_url?: string;
+}
+
+type ApiResponse = ApiSuccessResponse | ApiErrorResponse;
 
 // Add a new interface for tracking individual file upload results
 interface FileUploadResult {
@@ -28,7 +71,7 @@ interface FileUploadResult {
   pageUrl?: string;
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8001';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const FileUpload: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
