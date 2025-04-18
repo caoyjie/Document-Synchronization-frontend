@@ -86,8 +86,8 @@ interface FileUploadResult {
   };
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-//const API_BASE_URL = 'http://localhost:5000';
+//const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5000';
 
 const FileUpload: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -282,12 +282,11 @@ const FileUpload: React.FC = () => {
               } else {
                 failureCount++;
                 let errorMsg = `Error uploading ${file.name}: `;
-                
+                // show response data
                 if (axios.isAxiosError(axiosError)) {
-                  if (axiosError.response?.data?.detail) {
-                    errorMsg += `Server error: ${axiosError.response.data.detail}`;
-                  } else if (axiosError.response?.data?.message) {
-                    errorMsg += `Server error: ${axiosError.response.data.message}`;
+                  console.log('Response data:', axiosError.response?.data);
+                  if (axiosError.response?.data?.error?.message) {
+                    errorMsg += `${axiosError.response.data.error.message}`;
                   } else {
                     errorMsg += axiosError.message;
                   }
