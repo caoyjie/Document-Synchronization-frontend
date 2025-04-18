@@ -287,8 +287,8 @@ const FileUpload: React.FC = () => {
                   console.log('Response data:', axiosError.response?.data);
                   if (axiosError.response?.data?.error?.message) {
                     errorMsg += `${axiosError.response.data.error.message}`;
-                    // if axiosError.response.data.error.message = "API token is invalid" or "Database ID should be a valid uuid" end the rest tasks, show the error message                  } else {
-                    if (axiosError.response.data.error.message === "API token is invalid" || axiosError.response.data.error.message === "Database ID should be a valid uuid") {
+                    // if axiosError.response.data.error.message = "API token is invalid" or "Database ID should be a valid uuid" or "<xxx> not exist in your database" end the rest tasks, show the error message      
+                    if (axiosError.response.data.error.message === "API token is invalid" || axiosError.response.data.error.message === "Database ID should be a valid uuid" || axiosError.response.data.error.message.includes("not exist in your database")) {
                       setMessage({ type: 'error', text: axiosError.response.data.error.message });
                       setIsLoading(false);
                       return;
