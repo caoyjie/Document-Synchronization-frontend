@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import FileUpload from './components/FileUpload';
 import Help from './pages/Help';
 import NotFound from './pages/NotFound';
+import ErrorNotionBlocks from './pages/errorNotionBlocks';
+import ScrollToTop from './components/ScrollToTop';
 import './App.css';
 
 // Navigation component to handle active link styling
@@ -24,6 +26,7 @@ const Navigation = () => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="app-container">
         <div className="app-header">
           <div className="title-container">
@@ -36,6 +39,7 @@ function App() {
         <Routes>
           <Route path="/" element={<FileUpload />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/errorNotionBlocks" element={<ErrorNotionBlocks />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
 

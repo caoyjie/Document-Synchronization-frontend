@@ -403,13 +403,18 @@
 }
 
 .result-content {
-  color: var(--text-color);
-  font-size: 0.9rem;
+  margin-top: 10px;
 }
 
 .result-content p {
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.result-content .notion-link,
+.result-content .skipped-contents-link {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 5px;
 }
 
 .result-content .error-message {
@@ -425,18 +430,20 @@
   display: inline-block;
   color: var(--primary-color);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 0.2rem;
+  transition: all 0.2s ease;
   margin-top: 0.5rem;
-  transition: color 0.2s ease;
-  background-color: rgba(99, 102, 241, 0.1);
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .notion-link:hover {
-  color: var(--primary-hover);
-  background-color: rgba(99, 102, 241, 0.2);
-  text-decoration: none;
+  background: rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive adjustments for upload results */
@@ -539,4 +546,30 @@
 .submit-url-button:hover {
   background: var(--primary-dark);
   transform: translateY(-1px);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.skipped-contents-link {
+  display: inline-block;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 0.2rem;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.skipped-contents-link:hover {
+  background: rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 } 

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import './FileUpload.css';
 /* backend api response format
 def make_error_response(code: int, message: str, details=None):
@@ -39,7 +40,10 @@ interface FormData {
 interface ApiSuccessResponse {
   success: boolean;
   message: string;
-  data?: Record<string, unknown>;
+  data?: {
+    problem_blocks?: any;
+    [key: string]: unknown;
+  };
   request_id?: string;
   timestamp?: string;
   page_id?: string;
@@ -49,6 +53,10 @@ interface ApiSuccessResponse {
 interface ApiErrorResponse {
   success: boolean;
   message: string;
+  data?: {
+    problem_blocks?: any;
+    [key: string]: unknown;
+  };
   error: {
     code: number;
     message: string;
@@ -69,9 +77,17 @@ interface FileUploadResult {
   message: string;
   pageId?: string;
   pageUrl?: string;
+  problemBlocks?: any;
+  data: {
+    stats?: string;
+    page_url?: string;
+    problem_blocks?: any;
+    [key: string]: unknown;
+  };
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+//const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5000';
 
 const FileUpload: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -213,7 +229,9 @@ const FileUpload: React.FC = () => {
               });
               
               console.log(`Response for ${file.name}:`, response.data);
-              
+              console.log(`Response page_url ${file.name}:`, response.data.data?.page_url);
+              console.log(`Response stats ${file.name}:`, response.data.data?.stats);
+              console.log(`Response problem_blocks ${file.name}:`, response.data.data?.problem_blocks);
               setUploadProgress(prev => ({ ...prev, current: i + 1 }));
               
               // Consider the upload successful if we get any response from the server
@@ -225,10 +243,13 @@ const FileUpload: React.FC = () => {
                 fileName: file.name,
                 success: isSuccess,
                 message: isSuccess ? 'File uploaded successfully' : (response.data.message || 'Upload completed'),
-                pageId: response.data.page_id,
-                pageUrl: response.data.page_url
+                pageId: response.data.data?.page_id as string | undefined,
+                pageUrl: response.data.data?.page_url as string | undefined,
+                problemBlocks: response.data.data?.problem_blocks,
+                data: response.data.data || {}
               }]);
-              
+              // log show setUploadResults
+              console.log('setUploadResults:', setUploadResults);
               if (isSuccess) {
                 successCount++;
                 console.log(`Successfully uploaded ${file.name}`);
@@ -253,7 +274,9 @@ const FileUpload: React.FC = () => {
                   success: true,
                   message: 'File uploaded successfully (verified through Notion)',
                   pageId: undefined,
-                  pageUrl: undefined
+                  pageUrl: undefined,
+                  problemBlocks: undefined,
+                  data: {}
                 }]);
                 console.log(`File ${file.name} appears to have been uploaded successfully despite network error`);
               } else {
@@ -276,7 +299,9 @@ const FileUpload: React.FC = () => {
                 setUploadResults(prev => [...prev, {
                   fileName: file.name,
                   success: false,
-                  message: errorMsg
+                  message: errorMsg,
+                  problemBlocks: undefined,
+                  data: {}
                 }]);
                 
                 console.error(errorMsg);
@@ -291,7 +316,9 @@ const FileUpload: React.FC = () => {
             setUploadResults(prev => [...prev, {
               fileName: file.name,
               success: false,
-              message: errorMsg
+              message: errorMsg,
+              problemBlocks: undefined,
+              data: {}
             }]);
             
             console.error(errorMsg);
@@ -345,11 +372,23 @@ const FileUpload: React.FC = () => {
             success: response.data.success,
             message: response.data.success ? 'File uploaded successfully' : response.data.message,
             pageId: response.data.page_id,
-            pageUrl: response.data.page_url
+            pageUrl: response.data.page_url,
+            problemBlocks: response.data.data?.problem_blocks,
+            data: response.data.data || {}
           }]);
           
           if (response.data.success) {
-            setLastResponse(response.data);
+            // Make sure we're setting the complete response data including the data property
+            console.log('API Response:', response.data);
+            console.log('Problem blocks:', response.data.data?.problem_blocks);
+            
+            // Ensure data property exists and is properly structured
+            const responseData = {
+              ...response.data,
+              data: response.data.data || {}
+            };
+            
+            setLastResponse(responseData);
             setMessage({ 
               type: 'success', 
               text: `File uploaded successfully! ${
@@ -380,7 +419,9 @@ const FileUpload: React.FC = () => {
           setUploadResults(prev => [...prev, {
             fileName: formData.file ? formData.file.name : '',
             success: false,
-            message: errorMessage
+            message: errorMessage,
+            problemBlocks: undefined,
+            data: {}
           }]);
           
           setMessage({ type: 'error', text: errorMessage });
@@ -533,15 +574,27 @@ const FileUpload: React.FC = () => {
           <div className={`message ${message.type}`}>
             {message.type === 'success' && lastResponse?.page_url ? (
               <div>
-                <p>File uploaded successfully!</p>
-                <a 
-                  href={lastResponse.page_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="notion-link"
-                >
-                  View page in Notion
-                </a>
+                <div className="action-buttons">
+                  <a 
+                    href={lastResponse.page_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="notion-link"
+                  >
+                    View page in Notion
+                  </a>
+                  {console.log('LastResponse in UI:', lastResponse)}
+                  {console.log('Problem blocks in UI:', lastResponse.data?.problem_blocks)}
+                  {lastResponse.data && lastResponse.data.problem_blocks && (
+                    <Link 
+                      to="/errorNotionBlocks" 
+                      state={{ problemBlocks: lastResponse.data.problem_blocks }}
+                      className="skipped-contents-link"
+                    >
+                      Skipped contents
+                    </Link>
+                  )}
+                </div>
               </div>
             ) : (
               message.text
@@ -572,6 +625,15 @@ const FileUpload: React.FC = () => {
                         >
                           View page in Notion
                         </a>
+                      )}
+                      {result.problemBlocks && (
+                        <Link 
+                          to="/errorNotionBlocks" 
+                          state={{ problemBlocks: result.problemBlocks }}
+                          className="skipped-contents-link"
+                        >
+                          Skipped contents
+                        </Link>
                       )}
                     </div>
                   ) : (
