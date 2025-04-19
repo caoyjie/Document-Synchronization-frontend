@@ -105,7 +105,7 @@ const Help: React.FC = () => {
         <h2>Need More Help?</h2>
         <p>
           If you're still having issues, please contact us at{' '}
-          <a href="mailto:support@sync2notion.com">support@sync2notion.com</a>
+          <a href="mailto:Butterflydreamer3@outlook.com">Butterflydreamer3@outlook.com</a>
         </p>
       </div>
 

@@ -44,7 +44,7 @@ function App() {
         </Routes>
 
         <footer className="app-footer">
-          <p>Need assistance? Contact us at <a href="mailto:support@sync2notion.com">support@sync2notion.com</a></p>
+          <p>Need assistance? Contact us at <a href="mailto:Butterflydreamer3@outlook.com">Butterflydreamer3@outlook.com</a></p>
         </footer>
       </div>
     </Router>
