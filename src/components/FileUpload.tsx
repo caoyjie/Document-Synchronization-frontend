@@ -86,8 +86,8 @@ interface FileUploadResult {
   };
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-//const API_BASE_URL = 'http://localhost:5000';
+//const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5000';
 
 const FileUpload: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -169,8 +169,33 @@ const FileUpload: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Modified validation to only check for files, not URL
-    if ((!formData.file && formData.files.length === 0) || !formData.token || !formData.dbId) {
+    
+    // Validate URL format if URL input type is selected
+    if (inputType === 'url' && formData.url) {
+      console.log('Validating URL:', formData.url);
+      
+      // Basic URL validation - check if it starts with http:// or https://
+      if (!formData.url.startsWith('http://') && !formData.url.startsWith('https://')) {
+        console.error('URL validation failed: URL must start with http:// or https://');
+        setMessage({ type: 'error', text: 'URL must start with http:// or https://' });
+        return;
+      }
+      
+      try {
+        const urlObj = new URL(formData.url);
+        console.log('URL validation successful:', urlObj.href);
+      } catch (e) {
+        console.error('URL validation failed:', e);
+        setMessage({ type: 'error', text: 'Please enter a valid URL' });
+        return;
+      }
+    }
+    
+    // Check if we have either files or a valid URL based on input type
+    const hasValidInput = (inputType === 'files' && (formData.file || formData.files.length > 0)) || 
+                         (inputType === 'url' && formData.url);
+    
+    if (!hasValidInput || !formData.token || !formData.dbId) {
       setMessage({ type: 'error', text: 'Please fill in all required fields' });
       return;
     }
@@ -356,91 +381,71 @@ const FileUpload: React.FC = () => {
             text: `Uploaded ${successCount} of ${totalFiles} files successfully. ${failureCount} files failed.` 
           });
         }
-      } else if (formData.file) {
-        // Handle single file only - URL upload is commented out
+      } else if (inputType === 'url' && formData.url) {
+        // Handle URL upload
+        console.log('Processing URL upload:', formData.url);
         const formDataToSend = new FormData();
-        if (formData.file) {
-          formDataToSend.append('file', formData.file);
-        }
-        // URL upload is commented out
-        /*
-        else if (formData.url) {
-          formDataToSend.append('file', formData.url);
-        }
-        */
+        formDataToSend.append('url', formData.url);
         formDataToSend.append('token', formData.token);
         formDataToSend.append('db_id', formData.dbId);
         if (formData.tags) {
           formDataToSend.append('tags', formData.tags);
         }
+        
+        // Log the FormData contents
+        console.log('FormData contents:');
+        // Use a different approach to log FormData contents
+        console.log('URL:', formDataToSend.get('url'));
+        console.log('Token:', formDataToSend.get('token'));
+        console.log('Database ID:', formDataToSend.get('db_id'));
+        if (formData.tags) {
+          console.log('Tags:', formDataToSend.get('tags'));
+        }
 
         try {
+          console.log('Sending URL to server:', formData.url);
+          console.log('API endpoint:', `${API_BASE_URL}/api/upload`);
           const response = await axios.post<ApiResponse>(`${API_BASE_URL}/api/upload`, formDataToSend, {
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'multipart/form-data'
             },
             withCredentials: true
           });
+
+          console.log('URL upload response:', response.data);
           
-          // Add result to uploadResults
-          setUploadResults(prev => [...prev, {
-            fileName: formData.file ? formData.file.name : '',
-            success: response.data.success,
-            message: response.data.success ? 'File uploaded successfully' : response.data.message,
-            pageId: response.data.page_id,
-            pageUrl: response.data.page_url,
+          const isSuccess = response.data.success || response.status === 200 || response.status === 201;
+          
+          setUploadResults([{
+            fileName: formData.url,
+            success: isSuccess,
+            message: isSuccess ? 'URL uploaded successfully' : (response.data.message || 'Upload completed'),
+            pageId: response.data.data?.page_id as string | undefined,
+            pageUrl: response.data.data?.page_url as string | undefined,
             problemBlocks: response.data.data?.problem_blocks,
             data: response.data.data || {}
           }]);
-          
-          if (response.data.success) {
-            // Make sure we're setting the complete response data including the data property
-            console.log('API Response:', response.data);
-            console.log('Problem blocks:', response.data.data?.problem_blocks);
-            
-            // Ensure data property exists and is properly structured
-            const responseData = {
-              ...response.data,
-              data: response.data.data || {}
-            };
-            
-            setLastResponse(responseData);
-            setMessage({ 
-              type: 'success', 
-              text: `File uploaded successfully! ${
-                response.data.page_url 
-                  ? `View page: ${response.data.page_url}` 
-                  : `Page ID: ${response.data.page_id || 'N/A'}`
-              }`
-            });
+
+          if (isSuccess) {
+            setMessage({ type: 'success', text: 'URL uploaded successfully!' });
           } else {
-            setLastResponse(null);
-            setMessage({ type: 'error', text: response.data.message || 'Upload failed' });
+            setMessage({ type: 'error', text: response.data.message || 'Failed to upload URL' });
           }
         } catch (error) {
-          let errorMessage = 'Error uploading file. Please try again.';
+          let errorMessage = 'Error uploading URL. Please try again.';
           if (axios.isAxiosError(error)) {
-            if (error.response?.data?.detail) {
-              errorMessage = typeof error.response.data.detail === 'string' 
-                ? error.response.data.detail 
-                : 'Server error occurred';
-            } else if (error.response?.data?.message) {
-              errorMessage = error.response.data.message;
-            } else if (error.code === 'ERR_NETWORK') {
-              errorMessage = 'Cannot connect to the server. Please check your connection and try again.';
+            if (error.response?.data?.error?.message) {
+              errorMessage = error.response.data.error.message;
             }
           }
-          
-          // Add error result to uploadResults
-          setUploadResults(prev => [...prev, {
-            fileName: formData.file ? formData.file.name : '',
+          setMessage({ type: 'error', text: errorMessage });
+          setUploadResults([{
+            fileName: formData.url,
             success: false,
             message: errorMessage,
             problemBlocks: undefined,
             data: {}
           }]);
-          
-          setMessage({ type: 'error', text: errorMessage });
         }
       }
     } catch (error) {
@@ -472,15 +477,13 @@ const FileUpload: React.FC = () => {
           >
             Upload File/Files
           </button>
-          {/* URL upload button is commented out - not fully implemented yet */}
-          {/* 
+          {/* URL upload button */}
           <button
             className={`input-type-button ${inputType === 'url' ? 'active' : ''}`}
             onClick={() => setInputType('url')}
           >
             URL
           </button>
-          */}
         </div>
 
         {inputType === 'files' && (
@@ -506,8 +509,7 @@ const FileUpload: React.FC = () => {
           </div>
         )}
 
-        {/* URL input container is commented out - not fully implemented yet */}
-        {/* 
+        {/* URL input container */}
         {inputType === 'url' && (
           <div className="url-input-container">
             <div className="form-group">
@@ -517,14 +519,16 @@ const FileUpload: React.FC = () => {
                 type="text"
                 placeholder="https://example.com/document.pdf"
                 value={formData.url}
-                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                onChange={(e) => {
+                  console.log('URL input changed:', e.target.value);
+                  setFormData({ ...formData, url: e.target.value });
+                }}
                 className="url-input"
               />
               <p className="url-hint">Enter the URL of the file you want to upload to Notion</p>
             </div>
           </div>
         )}
-        */}
 
         {formData.files.length > 0 && inputType === 'files' && (
           <div className="selected-files">
@@ -654,7 +658,7 @@ const FileUpload: React.FC = () => {
                     </div>
                   ) : (
                     <div className="result-content">
-                      <p className="error-message">{result.message}</p>
+                      <p className="error-message">{result.message}</p>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
                     </div>
                   )}
                 </div>
